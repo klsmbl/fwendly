@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display:flex;gap:1.5rem;align-items:flex-start;">
+  <div>
+    {% if profile.photo %}
+      <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
+    {% else %}
+      <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
+    {% endif %}
+  </div>
+  <div style="flex:1;">
+    <h2 style="margin:0;">{{ profile.user.username }}</h2>
+    <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
+    <p>{{ profile.bio|linebreaks }}</p>
+    {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+
+    {% if user.is_authenticated and user != profile.user %}
+      <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+        <a href="{% url 'friend_add' profile.user.id %}" class="btn btn-blue">Add Friend</a>
+        <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
+      </div>
+      {% if mutual %}<p class="small" style="margin-top:0.5rem;"><strong>Mutual friends:</strong> {{ mutual.count }}</p>{% endif %}
+    {% endif %}
+
+    <hr style="margin:1rem 0;">
+    <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
+    {% for t in testimonials %}
+      <div class="card" style="margin-bottom:0.5rem;">
+        <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+        <div class="small" style="margin-top:0.5rem;">{{ t.content }}</div>
+      </div>
+    {% empty %}
+      <p>No testimonials yet.</p>
+    {% endfor %}
+    <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Testimonials for {{ target.username }}</h2>
+<div style="margin-top:0.75rem;">
+  {% for t in page_obj %}
+    <div class="card">
+      <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+      <div style="margin-top:0.5rem;">{{ t.content }}</div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="pager">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+  <div class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+</div>
+{% endblock %}

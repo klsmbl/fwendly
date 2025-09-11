@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2 style="margin-bottom:0.75rem;">Discover people</h2>
+<div class="grid">
+  {% for u in page_obj %}
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:1rem;">
+      {% if u.profile.photo %}
+        <img src="{{ u.profile.photo.url }}" class="avatar" alt="avatar">
+      {% else %}
+        <img src="{% static 'default-avatar.png' %}" class="avatar" alt="default avatar">
+      {% endif %}
+      <div>
+        <div style="font-weight:600;">{{ u.username }}</div>
+        <div class="small">{{ u.profile.location }}</div>
+      </div>
+    </div>
+    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+      <a href="{% url 'profile_view_user' u.username %}" class="btn btn-blue">View</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'friend_add' u.id %}" class="btn btn-green">Add</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="pager">
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">Previous</a>
+  {% endif %}
+  <div class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">Next</a>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="margin-bottom:0.75rem;">Search results{% if q %} for "{{ q }}"{% endif %}</h2>
+{% if page_obj and page_obj.paginator.count > 0 %}
+<div class="grid">
+  {% for u in page_obj %}
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:1rem;">
+        <img src="{{ u.profile.photo.url|default:'/static/default-avatar.png' }}" class="avatar">
+        <div>
+          <div style="font-weight:600;">{{ u.username }}</div>
+          <div class="small">{{ u.profile.location }}</div>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+        <a href="{% url 'profile_view_user' u.username %}" class="btn btn-blue">View</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'friend_add' u.id %}" class="btn btn-green">Add</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="pager">
+  {% if page_obj.has_previous %}
+    <a href="?q={{ q }}&page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+  <div class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+  {% if page_obj.has_next %}
+    <a href="?q={{ q }}&page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>
+{% else %}
+  <p>No results found.</p>
+{% endif %}
+{% endblock %}
