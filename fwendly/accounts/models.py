@@ -1,20 +1,52 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
 
 def user_avatar_path(instance, filename):
-    return f'avatars/user_{instance.user.id}/{filename}'
+    """Return file path for user avatar"""
+    ext = filename.split('.')[-1]
+    filename = f"{instance.user.username}_{int(now().timestamp())}.{ext}"
+    return os.path.join('avatars/', filename)
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    location = models.CharField(max_length=120, blank=True)
-    interests = models.TextField(blank=True, help_text="Comma-separated interests")
-    photo = models.ImageField(upload_to=user_avatar_path, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    photo = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True)
+    friends = models.ManyToManyField("self", symmetrical=True, blank=True)
+    bio = models.TextField(blank=True, null=True)
+    interests = models.CharField(max_length=255, blank=True, null=True)
     is_public = models.BooleanField(default=True)
-    friends = models.ManyToManyField('self', symmetrical=True, blank=True)
-
-    def __str__(self):
-        return f"Profile of {self.user.username}"
 
     def mutual_friends_with(self, other_profile):
         return self.friends.filter(id__in=other_profile.friends.all())
+
+    def __str__(self):
+        return self.user.username
+    
+
+
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(
+        User, related_name="friend_requests_sent", on_delete=models.CASCADE
+    )
+    to_user = models.ForeignKey(
+        User, related_name="friend_requests_received", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    accepted = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ("from_user", "to_user")
+
+    def accept(self):
+        self.from_user.profile.friends.add(self.to_user.profile)
+        self.to_user.profile.friends.add(self.from_user.profile)
+        self.accepted = True
+        self.save()
+
+    def decline(self):
+        self.delete()
+
+    def __str__(self):
+        return f"{self.from_user} -> {self.to_user} (accepted={self.accepted})"
+

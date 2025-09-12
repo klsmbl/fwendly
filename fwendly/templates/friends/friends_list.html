@@ -1,44 +1,107 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Your Friends</h2>
-<div style="margin-top:0.75rem;">
-  <h4>Incoming requests</h4>
-  {% for r in incoming %}
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-      <div>{{ r.from_user.username }}</div>
-      <div>
-        <a class="btn btn-blue" href="{% url 'friend_accept' r.id %}">Accept</a>
-      </div>
-    </div>
-  {% empty %}
-    <p class="small">No incoming requests.</p>
-  {% endfor %}
-</div>
+<div class="container" style="max-width:900px;margin:2rem auto;">
+  <h2 style="font-size:1.8rem;font-weight:700;margin-bottom:1rem;">👥 Your Friends</h2>
 
-<div style="margin-top:1rem;">
-  <h4>Your friends</h4>
-  <div class="grid">
-    {% for p in page_obj %}
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:1rem;">
-          <img src="{{ p.user.profile.photo.url|default:'/static/default-avatar.png' }}" class="avatar">
-          <div>
-            <div style="font-weight:600;">{{ p.user.username }}</div>
-            <div class="small">{{ p.location }}</div>
+  <!-- Incoming Requests -->
+  <section style="margin-bottom:2rem;">
+    <h4 style="font-size:1.3rem;font-weight:600;margin-bottom:0.5rem;">Incoming Requests</h4>
+    {% for r in incoming %}
+      <div class="card" 
+           style="display:flex;justify-content:space-between;align-items:center;
+                  padding:0.75rem 1rem;margin-bottom:0.5rem;
+                  border:1px solid #e2e8f0;border-radius:0.75rem;
+                  background:#f9fafb;">
+        <div style="font-weight:500;">{{ r.from_user.username }}</div>
+        <div style="display:flex;gap:0.5rem;">
+          <a href="{% url 'accept_request' r.id %}"
+             style="background:#3b82f6;color:white;padding:0.4rem 0.8rem;
+                    border-radius:0.5rem;text-decoration:none;font-size:0.9rem;">
+            Accept
+          </a>
+          <a href="{% url 'decline_request' r.id %}"
+             style="background:#ef4444;color:white;padding:0.4rem 0.8rem;
+                    border-radius:0.5rem;text-decoration:none;font-size:0.9rem;">
+            Decline
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <p style="color:#6b7280;">No incoming requests.</p>
+    {% endfor %}
+  </section>
+
+  <!-- Friends List -->
+  <section>
+    <h4 style="font-size:1.3rem;font-weight:600;margin-bottom:1rem;">Your Friends</h4>
+    <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;">
+      {% for p in page_obj %}
+        <div class="card"
+             style="padding:1rem;border:1px solid #e5e7eb;border-radius:1rem;
+                    background:white;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            {% if p.user.profile.photo %}
+              <img src="{{ p.user.profile.photo.url }}" 
+                   alt="avatar"
+                   style="width:50px;height:50px;object-fit:cover;border-radius:50%;">
+            {% else %}
+              <img src="/static/default-avatar.png" 
+                   alt="avatar"
+                   style="width:50px;height:50px;object-fit:cover;border-radius:50%;">
+            {% endif %}
+            <div>
+              <div style="font-weight:600;">{{ p.user.username }}</div>
+              <div style="color:#6b7280;font-size:0.85rem;">{{ p.location }}</div>
+            </div>
+          </div>
+          
+          <div style="margin-top:0.75rem;display:flex;gap:0.5rem; flex-wrap:wrap;">
+            <a href="{% url 'profile_view_user' p.user.username %}" 
+               style="flex:1;text-align:center;background:#3b82f6;color:white;
+                      padding:0.4rem 0.8rem;border-radius:0.5rem;text-decoration:none;">
+              View
+            </a>
+
+            {% if not p.user == request.user %}
+              {% if p.is_friend %}
+                <a href="{% url 'remove_friend' p.user.id %}" 
+                   style="flex:1;text-align:center;background:#ef4444;color:white;
+                          padding:0.4rem 0.8rem;border-radius:0.5rem;text-decoration:none;">
+                  Remove
+                </a>
+              {% elif not p.has_incoming_request and not p.has_outgoing_request %}
+                <a href="{% url 'friend_add' p.user.id %}" 
+                   style="flex:1;text-align:center;background:#10b981;color:white;
+                          padding:0.4rem 0.8rem;border-radius:0.5rem;text-decoration:none;">
+                  Add Friend
+                </a>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
-        <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
-          <a href="{% url 'profile_view_user' p.user.username %}" class="btn btn-blue">View</a>
-          <a href="{% url 'friend_remove' p.user.id %}" class="btn btn-red">Remove</a>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+      {% empty %}
+        <p style="color:#6b7280;">No friends yet.</p>
+      {% endfor %}
+    </div>
 
-  <div class="pager">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
-    <div class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
-  </div>
+    <!-- Pagination -->
+    <div style="margin-top:1.5rem;display:flex;justify-content:center;align-items:center;gap:1rem;">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" 
+           style="padding:0.4rem 0.8rem;background:#e5e7eb;border-radius:0.5rem;
+                  text-decoration:none;color:#374151;">Previous</a>
+      {% endif %}
+
+      <div style="font-size:0.9rem;color:#6b7280;">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </div>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" 
+           style="padding:0.4rem 0.8rem;background:#e5e7eb;border-radius:0.5rem;
+                  text-decoration:none;color:#374151;">Next</a>
+      {% endif %}
+    </div>
+  </section>
 </div>
 {% endblock %}
