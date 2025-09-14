@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="padding:2rem; text-align:center; max-width:500px; margin:2rem auto;">
+  <h2>{{ user_profile.user.username }}’s profile is private 🔒</h2>
+  <p>You cannot view this profile unless you are friends.</p>
+
+  <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center;">
+    <!-- Friend Request button -->
+    {% if user.is_authenticated and user != user_profile.user %}
+      <a href="{% url 'friend_add' user_profile.user.id %}" class="btn btn-blue">
+        Send Friend Request
+      </a>
+    {% endif %}
+
+    <!-- Home button -->
+    <a href="{% url 'search' %}" class="btn btn-ghost">🏠 Home</a>
+  </div>
+</div>
+{% endblock %}

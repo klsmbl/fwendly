@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ProfileForm
-from .models import Profile, FriendRequest  # Fixed import
+from .models import Profile, FriendRequest
+
 
 @login_required
 def profile_view(request):
@@ -12,6 +13,7 @@ def profile_view(request):
         'profile': profile,
         'testimonials': testimonials
     })
+
 
 @login_required
 def profile_edit(request):
@@ -26,15 +28,36 @@ def profile_edit(request):
         form = ProfileForm(instance=profile)
     return render(request, 'accounts/profile_edit.html', {'form': form})
 
+
 @login_required
 def profile_view_user(request, username):
-    # View another user's profile
     user_profile = get_object_or_404(Profile, user__username=username)
 
-    # Mutual friends (optional)
-    mutual = request.user.profile.mutual_friends_with(user_profile)
+    # Debug log
+    print("DEBUG: Viewing profile of", user_profile.user.username, "visibility:", user_profile.visibility)
 
-    # Friendship checks
+    # Case 1: Owner can always view
+    if request.user == user_profile.user:
+        can_view = True
+    else:
+        can_view = False
+        # Case 2: Public
+        if user_profile.visibility == "public":
+            can_view = True
+        # Case 3: Friends only → allow only if in friends
+        elif user_profile.visibility == "friends":
+            if user_profile in request.user.profile.friends.all():
+                can_view = True
+        # Case 4: Private → never allow unless owner (already handled above)
+
+    # If not allowed → show private_profile.html
+    if not can_view:
+        return render(request, "accounts/private_profile.html", {
+            "user_profile": user_profile
+        })
+
+    # Normal profile view
+    mutual = request.user.profile.mutual_friends_with(user_profile)
     already_friend = user_profile in request.user.profile.friends.all()
     outgoing_request = FriendRequest.objects.filter(
         from_user=request.user, to_user=user_profile.user, accepted=False
@@ -43,21 +66,12 @@ def profile_view_user(request, username):
         from_user=user_profile.user, to_user=request.user, accepted=False
     ).first()
 
-    return render(request, 'accounts/profile_view_user.html', {
-        'user_profile': user_profile,
-        'already_friend': already_friend,
-        'outgoing_request': outgoing_request,
-        'incoming_request': incoming_request,
-        'mutual': mutual,
+    return render(request, "accounts/profile_view_user.html", {
+        "user_profile": user_profile,
+        "already_friend": already_friend,
+        "outgoing_request": outgoing_request,
+        "incoming_request": incoming_request,
+        "mutual": mutual,
     })
 
-    # Calculate mutual friends
-    mutual = user_profile.mutual_friends_with(request.user.profile)
 
-    return render(request, 'accounts/profile_view_user.html', {
-        'user_profile': user_profile,
-        'already_friend': already_friend,
-        'outgoing_request': outgoing_request,
-        'incoming_request': incoming_request,
-        'mutual': mutual,
-    })

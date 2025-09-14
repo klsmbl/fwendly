@@ -9,19 +9,31 @@ def user_avatar_path(instance, filename):
     return os.path.join('avatars/', filename)
 
 class Profile(models.Model):
+    VISIBILITY_CHOICES = [
+        ('public', 'Public'),
+        ('friends', 'Friends only'),
+        ('private', 'Private'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     photo = models.ImageField(upload_to="profiles/", blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     interests = models.CharField(max_length=255, blank=True, null=True)
-    is_public = models.BooleanField(default=True)
+
+    visibility = models.CharField(
+        max_length=10,
+        choices=VISIBILITY_CHOICES,
+        default='public'
+    )
 
     def mutual_friends_with(self, other_profile):
         return self.friends.filter(id__in=other_profile.friends.all())
 
     def __str__(self):
         return self.user.username
+
     
 
 

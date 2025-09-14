@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="login-container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px;">
+  <div class="login-card" style="background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; overflow: hidden;">
+    
+    <!-- Header Section -->
+    <div class="login-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; text-align: center; color: white;">
+      <h2 style="margin: 0; font-weight: 600;">Welcome Back</h2>
+      <p style="margin: 0.5rem 0 0; opacity: 0.9;">Sign in to continue to your account</p>
+    </div>
+    
+    <!-- Form Section -->
+    <div style="padding: 2rem;">
+      <form method="post" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        
+        <!-- Form Fields with Improved Styling -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="id_login" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568;">Username or Email</label>
+          <input type="text" name="login" id="id_login" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Enter your username or email">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label for="id_password" style="font-weight: 500; color: #4a5568;">Password</label>
+            <a href="{% url 'account_reset_password' %}" style="font-size: 0.875rem; color: #667eea; text-decoration: none;">Forgot password?</a>
+          </div>
+          <input type="password" name="password" id="id_password" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Enter your password">
+        </div>
+        
+        <!-- Remember Me Checkbox -->
+        <div class="form-group" style="margin-bottom: 1.5rem; display: flex; align-items: center;">
+          <input type="checkbox" name="remember" id="id_remember" style="margin-right: 0.5rem;">
+          <label for="id_remember" style="color: #4a5568;">Remember me</label>
+        </div>
+        
+        <!-- Error Messages -->
+        {% if form.errors %}
+        <div class="error-message" style="background-color: #fed7d7; color: #c53030; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem;">
+          Your username and password didn't match. Please try again.
+        </div>
+        {% endif %}
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn-login" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          Log In
+        </button>
+      </form>
+      
+     
+      
+      <!-- Sign Up Link -->
+      <p style="text-align: center; margin: 0; color: #718096;">
+        Don't have an account? <a href="{% url 'account_signup' %}" style="color: #667eea; text-decoration: none; font-weight: 500;">Sign up</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hover effects */
+  .form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+  }
+  
+  .social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>
+{% endblock %}

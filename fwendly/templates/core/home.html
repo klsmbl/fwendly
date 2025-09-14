@@ -17,9 +17,11 @@
       </div>
     </div>
     <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
-      <a href="{% url 'profile_view_user' u.username %}" class="btn btn-blue">View</a>
-      {% if user.is_authenticated %}
-        <a href="{% url 'friend_add' u.id %}" class="btn btn-green">Add</a>
+      <a href="{% url 'profile_view_user' u.username %} "class="btn btn-blue">View</a>
+      {% if user.is_authenticated and u != user %}
+        {% if u.profile not in user.profile.friends.all %}
+          <a href="{% url 'friend_add' u.id %}" class="btn btn-green">Add</a>
+        {% endif %}
       {% endif %}
     </div>
   </div>

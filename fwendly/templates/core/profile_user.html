@@ -1,42 +1,143 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <div style="display:flex;gap:1.5rem;align-items:flex-start;">
-  <div>
-    {% if profile.photo %}
-      <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
-    {% else %}
-      <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
-    {% endif %}
-  </div>
-  <div style="flex:1;">
-    <h2 style="margin:0;">{{ profile.user.username }}</h2>
-    <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
-    <p>{{ profile.bio|linebreaks }}</p>
-    {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
 
-    {% if user.is_authenticated and user != profile.user %}
-      <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
-        {% if profile in user.profile.friends.all %}
-          <button class="btn btn-gray" disabled>Friends</button>
+  {% if profile.visibility == "public" %}
+    <!-- 🌍 Public: visible to everyone -->
+    <div>
+      {% if profile.photo %}
+        <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
+      {% else %}
+        <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
+      {% endif %}
+    </div>
+
+    <div style="flex:1;">
+      <h2 style="margin:0;">{{ profile.user.username }}</h2>
+      <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
+      <p>{{ profile.bio|linebreaks }}</p>
+      {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+      <p class="small"><strong>Visibility:</strong> Public</p>
+
+      {% if user.is_authenticated and user != profile.user %}
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+          {% if profile in user.profile.friends.all %}
+            <button class="btn btn-gray" disabled>Friends</button>
+          {% else %}
+            <a href="{% url 'friend_add' profile.user.id %}" class="btn btn-blue">Add Friend</a>
+          {% endif %}
+          <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
+        </div>
+        {% if mutual %}<p class="small" style="margin-top:0.5rem;"><strong>Mutual friends:</strong> {{ mutual.count }}</p>{% endif %}
+      {% endif %}
+
+      <hr style="margin:1rem 0;">
+      <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
+      {% for t in testimonials %}
+        <div class="card" style="margin-bottom:0.5rem;">
+          <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+          <div class="small" style="margin-top:0.5rem;">{{ t.content }}</div>
+        </div>
+      {% empty %}
+        <p>No testimonials yet.</p>
+      {% endfor %}
+      <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+    </div>
+
+  {% elif profile.visibility == "friends" %}
+    {% if user == profile.user or profile in user.profile.friends.all %}
+      <!-- 👥 Friends Only: visible to owner + friends -->
+      <div>
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
         {% else %}
-          <a href="{% url 'friend_add' profile.user.id %}" class="btn btn-blue">Add Friend</a>
+          <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
         {% endif %}
-        <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
       </div>
-      {% if mutual %}<p class="small" style="margin-top:0.5rem;"><strong>Mutual friends:</strong> {{ mutual.count }}</p>{% endif %}
+
+      <div style="flex:1;">
+        <h2 style="margin:0;">{{ profile.user.username }}</h2>
+        <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
+        <p>{{ profile.bio|linebreaks }}</p>
+        {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+        <p class="small"><strong>Visibility:</strong> Friends Only</p>
+
+        {% if user.is_authenticated and user != profile.user %}
+          <div style="display:flex;gap:0.5rem;margin-top:0.75rem;">
+            {% if profile in user.profile.friends.all %}
+              <button class="btn btn-gray" disabled>Friends</button>
+            {% else %}
+              <a href="{% url 'friend_add' profile.user.id %}" class="btn btn-blue">Add Friend</a>
+            {% endif %}
+            <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
+          </div>
+          {% if mutual %}<p class="small" style="margin-top:0.5rem;"><strong>Mutual friends:</strong> {{ mutual.count }}</p>{% endif %}
+        {% endif %}
+
+        <hr style="margin:1rem 0;">
+        <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
+        {% for t in testimonials %}
+          <div class="card" style="margin-bottom:0.5rem;">
+            <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+            <div class="small" style="margin-top:0.5rem;">{{ t.content }}</div>
+          </div>
+        {% empty %}
+          <p>No testimonials yet.</p>
+        {% endfor %}
+        <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+      </div>
+    {% else %}
+      <!-- 🚫 Not friends -->
+      <div style="flex:1; text-align:center; padding:2rem;">
+        <h2>{{ profile.user.username }}’s profile is for friends only 👥</h2>
+        <p>You must be friends to view this profile.</p>
+        {% if user.is_authenticated and user != profile.user %}
+          <a href="{% url 'friend_add' profile.user.id %}" class="btn btn-blue">Send Friend Request</a>
+        {% endif %}
+        <a href="{% url 'search' %}" class="btn btn-ghost" style="margin-top:1rem;">🏠 Back to Home</a>
+      </div>
     {% endif %}
 
-    <hr style="margin:1rem 0;">
-    <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
-    {% for t in testimonials %}
-      <div class="card" style="margin-bottom:0.5rem;">
-        <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
-        <div class="small" style="margin-top:0.5rem;">{{ t.content }}</div>
+  {% elif profile.visibility == "private" %}
+    {% if user == profile.user %}
+      <!-- 🔒 Private: only owner -->
+      <div>
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
+        {% else %}
+          <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
+        {% endif %}
       </div>
-    {% empty %}
-      <p>No testimonials yet.</p>
-    {% endfor %}
-    <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
-  </div>
+
+      <div style="flex:1;">
+        <h2 style="margin:0;">{{ profile.user.username }}</h2>
+        <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
+        <p>{{ profile.bio|linebreaks }}</p>
+        {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+        <p class="small"><strong>Visibility:</strong> Private</p>
+
+        <hr style="margin:1rem 0;">
+        <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
+        {% for t in testimonials %}
+          <div class="card" style="margin-bottom:0.5rem;">
+            <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+            <div class="small" style="margin-top:0.5rem;">{{ t.content }}</div>
+          </div>
+        {% empty %}
+          <p>No testimonials yet.</p>
+        {% endfor %}
+        <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+      </div>
+    {% else %}
+      <!-- 🚫 Other users blocked -->
+      <div style="flex:1; text-align:center; padding:2rem;">
+        <h2>{{ profile.user.username }}’s profile is private 🔒</h2>
+        <p>Only the owner can view this profile.</p>
+        <a href="{% url 'search' %}" class="btn btn-ghost" style="margin-top:1rem;">🏠 Back to Home</a>
+      </div>
+    {% endif %}
+  {% endif %}
 </div>
+
 {% endblock %}

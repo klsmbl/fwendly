@@ -13,6 +13,14 @@
     <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
     <p>{{ profile.bio|linebreaks }}</p>
     {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+    {% if profile.visibility == 'public' %}
+      <p class="small"><strong>Visibility:</strong> Public</p>
+    {% elif profile.visibility == 'private' %}
+      <p class="small"><strong>Visibility:</strong> Private</p>
+    {% elif profile.visibility == 'friends' %}
+      <p class="small"><strong>Visibility:</strong> Friends Only</p>
+    {% endif %}
+
     <a href="{% url 'profile_edit' %}" class="btn btn-blue">Edit Profile</a>
     <hr style="margin:1rem 0;">
     <h3>Testimonials</h3>

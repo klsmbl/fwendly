@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="signup-container" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px;">
+  <div class="signup-card" style="background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; overflow: hidden;">
+    
+    <!-- Header Section -->
+    <div class="signup-header" style="background: linear-gradient(135deg, #5e9af9 0%, #4361ee 100%); padding: 2rem; text-align: center; color: white;">
+      <h2 style="margin: 0; font-weight: 600;">Create Your Account</h2>
+      <p style="margin: 0.5rem 0 0; opacity: 0.9;">Join our community today</p>
+    </div>
+    
+    <!-- Form Section -->
+    <div style="padding: 2rem;">
+      <form method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+        
+       
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="id_email" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568;">Email Address</label>
+          <input type="email" name="email" id="id_email" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Enter your email">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="id_username" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568;">Username</label>
+          <input type="text" name="username" id="id_username" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Choose a username">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="id_password1" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568;">Password</label>
+          <input type="password" name="password1" id="id_password1" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Create a password">
+          <div class="password-requirements" style="font-size: 0.75rem; color: #718096; margin-top: 0.5rem;">
+            Use at least 8 characters with a mix of letters, numbers & symbols
+          </div>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="id_password2" style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #4a5568;">Confirm Password</label>
+          <input type="password" name="password2" id="id_password2" required style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; transition: all 0.3s;" placeholder="Confirm your password">
+        </div>
+        
+        <!-- Terms Agreement -->
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: flex-start;">
+            <input type="checkbox" name="terms" id="id_terms" required style="margin-top: 0.2rem; margin-right: 0.5rem;">
+            <label for="id_terms" style="color: #4a5568; font-size: 0.875rem;">
+              I agree to the <a href="#" style="color: #4361ee; text-decoration: none;">Terms of Service</a> and <a href="#" style="color: #4361ee; text-decoration: none;">Privacy Policy</a>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Error Messages -->
+        {% if form.errors %}
+        <div class="error-message" style="background-color: #fed7d7; color: #c53030; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem;">
+          Please correct the errors below.
+        </div>
+        {% endif %}
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn-signup" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #5e9af9 0%, #4361ee 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          Create Account
+        </button>
+      </form>
+      
+      
+      
+      <!-- Login Link -->
+      <p style="text-align: center; margin: 0; color: #718096;">
+        Already have an account? <a href="{% url 'account_login' %}" style="color: #4361ee; text-decoration: none; font-weight: 500;">Log in</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Hover effects */
+  .form-group input:focus {
+    outline: none;
+    border-color: #4361ee;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+  }
+  
+  .btn-signup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+  }
+  
+  .social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .signup-card {
+      max-width: 100%;
+    }
+  }
+</style>
+{% endblock %}

@@ -1,14 +1,35 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
-<div style="max-width:720px;">
-  <h2>Edit Profile</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div style="display:flex;gap:0.5rem;">
-      <button class="btn btn-green" type="submit">Save</button>
-      <a class="btn btn-ghost" href="{% url 'profile' %}">Cancel</a>
-    </div>
-  </form>
-</div>
+<h2>Edit Profile</h2>
+
+<form method="post" enctype="multipart/form-data" class="card" style="max-width:500px;margin:auto;padding:1.5rem;">
+  {% csrf_token %}
+
+  <div style="margin-bottom:1rem;">
+    {{ form.photo.label_tag }}<br>
+    {{ form.photo }}
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    {{ form.location.label_tag }}<br>
+    {{ form.location }}
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    {{ form.bio.label_tag }}<br>
+    {{ form.bio }}
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    {{ form.interests.label_tag }}<br>
+    {{ form.interests }}
+  </div>
+
+  <div style="margin-bottom:1rem;">
+    <label for="id_visibility"><strong>Who can see your profile?</strong></label><br>
+    {{ form.visibility }}
+  </div>
+
+  <button type="submit" class="btn btn-blue">Save</button>
+</form>
 {% endblock %}
