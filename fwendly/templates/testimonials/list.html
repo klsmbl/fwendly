@@ -1,18 +1,50 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Testimonials for {{ target.username }}</h2>
+
 <div style="margin-top:0.75rem;">
   {% for t in page_obj %}
-    <div class="card">
-      <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+    <div class="card" style="margin-bottom:1rem; padding:1rem;">
+      <!-- Testimonial -->
+      <div style="font-weight:600;">
+        {{ t.author.username }}
+        <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span>
+      </div>
       <div style="margin-top:0.5rem;">{{ t.content }}</div>
+
+      <!-- 💬 Comments -->
+      <div style="margin-top:0.75rem; padding-left:1rem; border-left:2px solid #ddd;">
+        <h4 style="margin-bottom:0.25rem; font-size:0.9rem;">Comments</h4>
+        {% for c in t.comments.all %}
+          <p class="small" style="margin:0.25rem 0;">
+            <strong>{{ c.author.username }}</strong>: {{ c.content }}
+            <span class="small" style="color:#888;">({{ c.created_at|date:"M d, Y H:i" }})</span>
+          </p>
+        {% empty %}
+          <p class="small" style="color:#888;">No comments yet.</p>
+        {% endfor %}
+      </div>
+
+      <!-- ✍️ Add Comment Form -->
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'add_comment' t.id %}" style="margin-top:0.5rem;">
+          {% csrf_token %}
+          <textarea name="content" rows="2" placeholder="Write a comment..." style="width:100%;"></textarea>
+          <button type="submit" class="btn btn-ghost" style="margin-top:0.25rem;">Comment</button>
+        </form>
+      {% endif %}
     </div>
   {% endfor %}
 </div>
 
+<!-- Pager -->
 <div class="pager">
-  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
   <div class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
-  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
 </div>
 {% endblock %}

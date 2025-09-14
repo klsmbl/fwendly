@@ -29,3 +29,26 @@ def view_testimonials(request, username):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request, 'testimonials/list.html', {'page_obj': page_obj, 'target': target})
+
+
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from .models import Testimonial, Comment
+
+@login_required
+def add_comment(request, testimonial_id):
+    testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content:
+            Comment.objects.create(
+                testimonial=testimonial,
+                author=request.user,
+                content=content
+            )
+            messages.success(request, "Comment added!")
+    # redirect to the correct testimonial list page
+    return redirect('testimonial_list', username=testimonial.target.username)
+

@@ -29,9 +29,10 @@
         <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
         <div style="margin-top:0.5rem;">{{ t.content }}</div>
       </div>
-    {% empty %}
-      <p>No testimonials yet.</p>
-    {% endfor %}
+      {% empty %}
+        <p>No testimonials yet.</p>
+      {% endfor %}
+      <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
   </div>
 </div>
 {% endblock %}
