@@ -7,6 +7,11 @@ class Testimonial(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    likes = models.ManyToManyField(User, related_name="testimonial_likes", blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
+
     def __str__(self):
         return f"Testimonial by {self.author} for {self.target}"
 

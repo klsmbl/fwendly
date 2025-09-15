@@ -12,6 +12,20 @@
       </div>
       <div style="margin-top:0.5rem;">{{ t.content }}</div>
 
+      <!-- ❤️ Like system -->
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'like_testimonial' t.id %}" style="margin-top:0.5rem;">
+          {% csrf_token %}
+          {% if user in t.likes.all %}
+            <button type="submit" class="btn btn-red">❤️ Unlike ({{ t.total_likes }})</button>
+          {% else %}
+            <button type="submit" class="btn btn-blue">🤍 Like ({{ t.total_likes }})</button>
+          {% endif %}
+        </form>
+      {% else %}
+        <p class="small" style="color:#888; margin-top:0.5rem;">Login to like this testimonial.</p>
+      {% endif %}
+
       <!-- 💬 Comments -->
       <div style="margin-top:0.75rem; padding-left:1rem; border-left:2px solid #ddd;">
         <h4 style="margin-bottom:0.25rem; font-size:0.9rem;">Comments</h4>

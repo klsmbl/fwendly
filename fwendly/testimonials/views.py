@@ -52,3 +52,15 @@ def add_comment(request, testimonial_id):
     # redirect to the correct testimonial list page
     return redirect('testimonial_list', username=testimonial.target.username)
 
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+@login_required
+def like_testimonial(request, testimonial_id):
+    testimonial = get_object_or_404(Testimonial, id=testimonial_id)
+    if request.user in testimonial.likes.all():
+        testimonial.likes.remove(request.user)  # Unlike
+    else:
+        testimonial.likes.add(request.user)  # Like
+    return redirect('testimonial_list', username=testimonial.target.username)
