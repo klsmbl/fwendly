@@ -17,6 +17,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     photo = models.ImageField(upload_to="profiles/", blank=True, null=True)
+    background = models.ImageField(upload_to='backgrounds/', blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
     friends = models.ManyToManyField("self", symmetrical=True, blank=True)
     bio = models.TextField(blank=True, null=True)
