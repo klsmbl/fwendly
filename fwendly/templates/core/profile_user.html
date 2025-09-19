@@ -109,11 +109,18 @@
             <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
           </div>
           {% if mutual %}
-            <p class="small" style="margin-top:0.5rem;">
-              <strong>Mutual friends:</strong> {{ mutual.count }}
-            </p>
-          {% endif %}
+          <p class="small" style="margin-top:0.5rem;">
+            <strong>Mutual friends:</strong> {{ mutual.count }}
+          </p>
+          <ul class="small" style="margin:0.5rem 0 0 1rem;">
+            {% for mf in mutual %}
+              <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
+            {% empty %}
+              <li>No mutual friends</li>
+            {% endfor %}
+          </ul>
         {% endif %}
+      {% endif %}
 
         <hr style="margin:1rem 0;">
         <h3 style="margin-bottom:0.5rem;">Testimonials</h3>

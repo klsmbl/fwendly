@@ -42,20 +42,6 @@
         <!-- ✅ Show only to the profile owner -->
         <a href="{% url 'create_post' %}" class="btn btn-green">+ Create Post</a>
       {% endif %}
-      <!-- ✅ Mutual Friends Section -->
-      
-      {% if mutual_count is not None %}
-      <hr style="margin:1rem 0;">
-      <h3>You and {{ profile.user.username }} have {{ mutual_count }} mutual friend{{ mutual_count|pluralize }}.</h3>
-
-      {% if mutual_count > 0 %}
-        <ul>
-          {% for mf in mutual %}
-            <li>{{ mf.user.username }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endif %}
     </div>
   </div>
 </div>
