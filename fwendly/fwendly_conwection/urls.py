@@ -14,6 +14,7 @@ urlpatterns = [
     path('friends/', include('friends.urls')),
     path('testimonials/', include('testimonials.urls')),
     path('search/', include('core.urls')),
+    path('posts/', include('posts.urls')),
 ]
 
 if settings.DEBUG:

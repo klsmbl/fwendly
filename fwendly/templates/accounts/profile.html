@@ -38,21 +38,59 @@
       {% endif %}
 
       <a href="{% url 'profile_edit' %}" class="btn btn-blue">Edit Profile</a>
+      {% if user == profile.user %}
+        <!-- ✅ Show only to the profile owner -->
+        <a href="{% url 'create_post' %}" class="btn btn-green">+ Create Post</a>
+      {% endif %}
+      <!-- ✅ Mutual Friends Section -->
+      
+      {% if mutual_count is not None %}
+      <hr style="margin:1rem 0;">
+      <h3>You and {{ profile.user.username }} have {{ mutual_count }} mutual friend{{ mutual_count|pluralize }}.</h3>
+
+      {% if mutual_count > 0 %}
+        <ul>
+          {% for mf in mutual %}
+            <li>{{ mf.user.username }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endif %}
     </div>
   </div>
 </div>
+
 
 <!-- ⭐ Testimonials -->
 <div style="margin-top:1.5rem;">
   <h3>Testimonials</h3>
   {% for t in testimonials %}
     <div class="card" style="margin-bottom:0.5rem;">
-      <div style="font-weight:600;">{{ t.author.username }} <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span></div>
+      <div style="font-weight:600;">{{ t.author.username }} 
+        <span class="small" style="font-weight:400;">— {{ t.created_at|date:'M d, Y' }}</span>
+      </div>
       <div style="margin-top:0.5rem;">{{ t.content }}</div>
     </div>
   {% empty %}
     <p>No testimonials yet.</p>
   {% endfor %}
   <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+</div>
+
+<!-- 🖼️ User Posts -->
+<div style="margin-top:2rem;">
+  <h3>Posts</h3>
+  {% for post in profile.user.posts.all %}
+    <div class="card" style="margin-bottom:1rem;">
+      <img src="{{ post.image.url }}" alt="Post image" style="width:100%;border-radius:8px;">
+      {% if post.caption %}
+        <p style="margin-top:0.5rem;">{{ post.caption }}</p>
+      {% endif %}
+      <p class="small" style="color:#888;">{{ post.created_at|date:"M d, Y H:i" }}</p>
+    </div>
+  {% empty %}
+    <p>No posts yet.</p>
+  {% endfor %}
+  <a href="{% url 'user_posts' profile.user.username %}" class="btn btn-ghost">View All Posts</a>
 </div>
 {% endblock %}

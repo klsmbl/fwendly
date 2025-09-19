@@ -38,11 +38,18 @@
           <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
         </div>
         {% if mutual %}
-          <p class="small" style="margin-top:0.5rem;">
-            <strong>Mutual friends:</strong> {{ mutual.count }}
-          </p>
-        {% endif %}
+        <p class="small" style="margin-top:0.5rem;">
+          <strong>Mutual friends:</strong> {{ mutual.count }}
+        </p>
+        <ul class="small" style="margin:0.5rem 0 0 1rem;">
+          {% for mf in mutual %}
+            <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
+          {% empty %}
+            <li>No mutual friends</li>
+          {% endfor %}
+        </ul>
       {% endif %}
+    {% endif %}
 
       <hr style="margin:1rem 0;">
       <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
@@ -58,7 +65,22 @@
       {% endfor %}
       <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
     </div>
-
+    <!-- 🖼️ User Posts -->
+    <div style="margin-top:2rem;">
+      <h3>Posts</h3>
+      {% for post in profile.user.posts.all %}
+        <div class="card" style="margin-bottom:1rem;">
+          <img src="{{ post.image.url }}" alt="Post image" style="width:100%;border-radius:8px;">
+          {% if post.caption %}
+            <p style="margin-top:0.5rem;">{{ post.caption }}</p>
+          {% endif %}
+          <p class="small" style="color:#888;">{{ post.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+      {% empty %}
+        <p>No posts yet.</p>
+      {% endfor %}
+      <a href="{% url 'user_posts' profile.user.username %}" class="btn btn-ghost">View All Posts</a>
+    </div>
   {% elif profile.visibility == "friends" %}
     {% if user == profile.user or profile in user.profile.friends.all %}
       <!-- 👥 Friends Only: visible to owner + friends -->
@@ -106,6 +128,22 @@
           <p>No testimonials yet.</p>
         {% endfor %}
         <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
+      </div>
+      <!-- 🖼️ User Posts -->
+      <div style="margin-top:2rem;">
+        <h3>Posts</h3>
+        {% for post in profile.user.posts.all %}
+          <div class="card" style="margin-bottom:1rem;">
+            <img src="{{ post.image.url }}" alt="Post image" style="width:100%;border-radius:8px;">
+            {% if post.caption %}
+              <p style="margin-top:0.5rem;">{{ post.caption }}</p>
+            {% endif %}
+            <p class="small" style="color:#888;">{{ post.created_at|date:"M d, Y H:i" }}</p>
+          </div>
+        {% empty %}
+          <p>No posts yet.</p>
+        {% endfor %}
+        <a href="{% url 'user_posts' profile.user.username %}" class="btn btn-ghost">View All Posts</a>
       </div>
     {% else %}
       <!-- 🚫 Not friends -->

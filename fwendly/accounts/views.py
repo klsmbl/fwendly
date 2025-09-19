@@ -57,7 +57,9 @@ def profile_view_user(request, username):
         })
 
     # Normal profile view
-    mutual = request.user.profile.mutual_friends_with(user_profile)
+    mutual_qs = request.user.profile.mutual_friends_with(user_profile)
+    mutual_count = mutual_qs.count()  # ✅ number of mutual friends
+
     already_friend = user_profile in request.user.profile.friends.all()
     outgoing_request = FriendRequest.objects.filter(
         from_user=request.user, to_user=user_profile.user, accepted=False
@@ -71,7 +73,6 @@ def profile_view_user(request, username):
         "already_friend": already_friend,
         "outgoing_request": outgoing_request,
         "incoming_request": incoming_request,
-        "mutual": mutual,
+        "mutual": mutual_qs,          # full list if you want to show actual names
+        "mutual_count": mutual_count, # ✅ count for "You have X mutual friends"
     })
-
-

@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'friends',
     'testimonials',
     'core',
+    'posts',
 ]
 
 SITE_ID = 1
