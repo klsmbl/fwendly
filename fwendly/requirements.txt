@@ -10,3 +10,4 @@ Pillow
 django-allauth   
 django-crispy-forms  
 crispy-bootstrap5 
+django-db-file-storage
