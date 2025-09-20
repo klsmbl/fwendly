@@ -1,5 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<!-- 🔙 Back Button -->
+<div style="margin-bottom:1rem;">
+  {% if request.user == target %}
+    <!-- Logged-in user's own testimonials -->
+    <a href="{% url 'profile' %}" class="btn btn-ghost">← Back</a>
+  {% else %}
+    <!-- Viewing another user's testimonials -->
+    <a href="{% url 'profile_view_user' target.username %}" class="btn btn-ghost">← Back</a>
+  {% endif %}
+</div>
+
 <h2>Testimonials for {{ target.username }}</h2>
 
 <div style="margin-top:0.75rem;">
@@ -13,10 +25,10 @@
       <div style="margin-top:0.5rem;">{{ t.content }}</div>
 
       <!-- ❤️ Like system -->
-      {% if user.is_authenticated %}
+      {% if request.user.is_authenticated %}
         <form method="post" action="{% url 'like_testimonial' t.id %}" style="margin-top:0.5rem;">
           {% csrf_token %}
-          {% if user in t.likes.all %}
+          {% if request.user in t.likes.all %}
             <button type="submit" class="btn btn-red">❤️ Unlike ({{ t.total_likes }})</button>
           {% else %}
             <button type="submit" class="btn btn-blue">🤍 Like ({{ t.total_likes }})</button>
@@ -40,7 +52,7 @@
       </div>
 
       <!-- ✍️ Add Comment Form -->
-      {% if user.is_authenticated %}
+      {% if request.user.is_authenticated %}
         <form method="post" action="{% url 'add_comment' t.id %}" style="margin-top:0.5rem;">
           {% csrf_token %}
           <textarea name="content" rows="2" placeholder="Write a comment..." style="width:100%;"></textarea>
@@ -61,4 +73,5 @@
     <a href="?page={{ page_obj.next_page_number }}">Next</a>
   {% endif %}
 </div>
+
 {% endblock %}

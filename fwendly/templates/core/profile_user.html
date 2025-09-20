@@ -1,31 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- 🌄 Background Photo -->
+<!-- 🌄 Background Photo with profile photo overlap -->
 {% if profile.background %}
-  <div style="width:100%;height:200px;overflow:hidden;border-radius:12px;margin-bottom:1rem;">
+  <!-- 🌄 Background Photo -->
+  <div style="position:relative;width:100%;height:520px;overflow:hidden;border-radius:12px;margin-bottom:6rem;">
     <img src="{{ profile.background.url }}" alt="Background photo" style="width:100%;height:100%;object-fit:cover;">
+  </div>
+
+  <!-- 👤 Independent Profile Photo (floats outside background) -->
+  <div style="margin-top:-250px; margin-left:2rem; position:relative; z-index:10;">
+    {% if profile.photo %}
+      <img src="{{ profile.photo.url }}" alt="Profile photo" style="width:140px;height:140px;border-radius:50%;border:4px solid white;object-fit:cover;">
+    {% else %}
+      <div style="width:140px;height:140px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;border:4px solid white;">
+        No photo
+      </div>
+    {% endif %}
   </div>
 {% endif %}
 
-<div style="display:flex;gap:1.5rem;align-items:flex-start;">
+
+<!-- 🔽 Added extra margin-top so profile info appears lower -->
+<div style="display:flex;gap:1.5rem;align-items:flex-start;margin-top:2rem;">
 
   {% if profile.visibility == "public" %}
     <!-- 🌍 Public: visible to everyone -->
-    
-    <div>
-      {% if profile.photo %}
-        <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
-      {% else %}
-        <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
-      {% endif %}
-    </div>
 
     <div style="flex:1;">
-      <h2 style="margin:0;">{{ profile.user.username }}</h2>
-      <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
-      <p>{{ profile.bio|linebreaks }}</p>
-      {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+        <h2 style="margin:0;">{{ profile.user.username }}</h2>
+        <div class="small" style="margin-bottom:0.5rem;"><strong>Location:</strong> {{ profile.location }}</div>
+        <div class="small" style="margin-bottom:0.5rem;"><strong>Bio:</strong> {{ profile.bio}}</div>
+        {% if profile.interests %}
+          <p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>
+      {% endif %}
       <p class="small"><strong>Visibility:</strong> Public</p>
 
       {% if user.is_authenticated and user != profile.user %}
@@ -38,18 +46,18 @@
           <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
         </div>
         {% if mutual %}
-        <p class="small" style="margin-top:0.5rem;">
-          <strong>Mutual friends:</strong> {{ mutual.count }}
-        </p>
-        <ul class="small" style="margin:0.5rem 0 0 1rem;">
-          {% for mf in mutual %}
-            <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
-          {% empty %}
-            <li>No mutual friends</li>
-          {% endfor %}
-        </ul>
+          <p class="small" style="margin-top:0.5rem;">
+            <strong>Mutual friends:</strong> {{ mutual.count }}
+          </p>
+          <ul class="small" style="margin:0.5rem 0 0 1rem;">
+            {% for mf in mutual %}
+              <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
+            {% empty %}
+              <li>No mutual friends</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       {% endif %}
-    {% endif %}
 
       <hr style="margin:1rem 0;">
       <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
@@ -65,8 +73,9 @@
       {% endfor %}
       <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
     </div>
+
     <!-- 🖼️ User Posts -->
-    <div style="margin-top:2rem;">
+    <div style="margin-top:2rem;flex:1;">
       <h3>Posts</h3>
       {% for post in profile.user.posts.all %}
         <div class="card" style="margin-bottom:1rem;">
@@ -81,22 +90,17 @@
       {% endfor %}
       <a href="{% url 'user_posts' profile.user.username %}" class="btn btn-ghost">View All Posts</a>
     </div>
+
   {% elif profile.visibility == "friends" %}
     {% if user == profile.user or profile in user.profile.friends.all %}
       <!-- 👥 Friends Only: visible to owner + friends -->
-      <div>
-        {% if profile.photo %}
-          <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
-        {% else %}
-          <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
-        {% endif %}
-      </div>
-
       <div style="flex:1;">
         <h2 style="margin:0;">{{ profile.user.username }}</h2>
-        <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
-        <p>{{ profile.bio|linebreaks }}</p>
-        {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+        <div class="small" style="margin-bottom:0.5rem;"><strong>Location:</strong> {{ profile.location }}</div>
+        <div class="small" style="margin-bottom:0.5rem;"><strong>Bio:</strong> {{ profile.bio}}</div>
+        {% if profile.interests %}
+          <p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>
+        {% endif %}
         <p class="small"><strong>Visibility:</strong> Friends Only</p>
 
         {% if user.is_authenticated and user != profile.user %}
@@ -109,18 +113,18 @@
             <a href="{% url 'testimonial_write' profile.user.username %}" class="btn btn-ghost">Write Testimonial</a>
           </div>
           {% if mutual %}
-          <p class="small" style="margin-top:0.5rem;">
-            <strong>Mutual friends:</strong> {{ mutual.count }}
-          </p>
-          <ul class="small" style="margin:0.5rem 0 0 1rem;">
-            {% for mf in mutual %}
-              <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
-            {% empty %}
-              <li>No mutual friends</li>
-            {% endfor %}
-          </ul>
+            <p class="small" style="margin-top:0.5rem;">
+              <strong>Mutual friends:</strong> {{ mutual.count }}
+            </p>
+            <ul class="small" style="margin:0.5rem 0 0 1rem;">
+              {% for mf in mutual %}
+                <li><a href="{% url 'profile_user' mf.user.username %}">{{ mf.user.username }}</a></li>
+              {% empty %}
+                <li>No mutual friends</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         {% endif %}
-      {% endif %}
 
         <hr style="margin:1rem 0;">
         <h3 style="margin-bottom:0.5rem;">Testimonials</h3>
@@ -136,8 +140,9 @@
         {% endfor %}
         <a class="small" href="{% url 'testimonial_list' profile.user.username %}">View all testimonials</a>
       </div>
+
       <!-- 🖼️ User Posts -->
-      <div style="margin-top:2rem;">
+      <div style="margin-top:2rem;flex:1;">
         <h3>Posts</h3>
         {% for post in profile.user.posts.all %}
           <div class="card" style="margin-bottom:1rem;">
@@ -167,19 +172,13 @@
   {% elif profile.visibility == "private" %}
     {% if user == profile.user %}
       <!-- 🔒 Private: only owner -->
-      <div>
-        {% if profile.photo %}
-          <img src="{{ profile.photo.url }}" class="profile-photo" alt="photo">
-        {% else %}
-          <div style="width:140px;height:140px;border-radius:12px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;">No photo</div>
-        {% endif %}
-      </div>
-
       <div style="flex:1;">
         <h2 style="margin:0;">{{ profile.user.username }}</h2>
         <div class="small" style="margin-bottom:0.5rem;">{{ profile.location }}</div>
         <p>{{ profile.bio|linebreaks }}</p>
-        {% if profile.interests %}<p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>{% endif %}
+        {% if profile.interests %}
+          <p class="small"><strong>Interests:</strong> {{ profile.interests }}</p>
+        {% endif %}
         <p class="small"><strong>Visibility:</strong> Private</p>
 
         <hr style="margin:1rem 0;">

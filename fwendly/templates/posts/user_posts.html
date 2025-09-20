@@ -1,57 +1,90 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>{{ user.username }}’s Posts</h2>
+<!-- 🔙 Back to Profile -->
+<div style="margin-bottom:1rem;">
+  {% if request.user == user %}
+    <!-- If this is the logged-in user's posts -->
+    <a href="{% url 'profile' %}" class="btn btn-ghost">← Back</a>
+  {% else %}
+    <!-- If viewing another user's posts -->
+    <a href="{% url 'profile_view_user' user.username %}" class="btn btn-ghost">← Back</a>
+  {% endif %}
+</div>
+<!-- Title -->
+<h2 style="text-align:center; margin-bottom:1.5rem;">
+  {{ user.username }}’s Posts
+</h2>
 
-<div style="margin-top:1rem;">
-  {% for post in posts %}
-    <div class="card" style="margin-bottom:1rem; padding:1rem;">
-      <!-- 📸 Post Image -->
-      <img src="{{ post.image.url }}" alt="Post image" style="width:100%;border-radius:8px;">
+<!-- Centered container -->
+<div style="display:flex; justify-content:center;">
+  <div style="width:100%; max-width:600px;"> <!-- Facebook-like width -->
 
-      <!-- 📝 Caption -->
-      {% if post.caption %}
-        <p style="margin-top:0.5rem;">{{ post.caption }}</p>
-      {% endif %}
-      <p class="small" style="color:#888;">{{ post.created_at|date:"M d, Y H:i" }}</p>
+    {% for post in posts %}
+      <div class="card" style="margin-bottom:1.5rem; padding:1rem; border:1px solid #ddd; border-radius:8px; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+        
+        <!-- 👤 Poster Info -->
+        <div style="display:flex; align-items:center; margin-bottom:0.75rem;">
+          {% if post.author.profile.photo %}
+            <img src="{{ post.author.profile.photo.url }}" alt="Profile" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:0.5rem;">
+          {% endif %}
+          <div>
+            <strong>{{ post.author.username }}</strong><br>
+            <span class="small" style="color:#888;">{{ post.created_at|date:"M d, Y H:i" }}</span>
+          </div>
+        </div>
+
+        <!-- 📸 Post Image -->
+        <div style="text-align:center;">
+          <img src="{{ post.image.url }}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:8px;">
+        </div>
+
+        <!-- 📝 Caption -->
+        {% if post.caption %}
+          <p style="margin-top:0.75rem;">{{ post.caption }}</p>
+        {% endif %}
 
         <!-- ❤️ Like Button -->
-    {% if user.is_authenticated %}
-    <form method="post" action="{% url 'toggle_post_like' post.id %}" style="display:inline;">
-    {% csrf_token %}
-    {% if post.liked_by_user %}
-        <button type="submit" class="btn btn-gray">❤️ Unlike ({{ post.likes.count }})</button>
-    {% else %}
-        <button type="submit" class="btn btn-red">🤍 Like ({{ post.likes.count }})</button>
-    {% endif %}
-    </form>
-    {% else %}
-    <p class="small" style="color:#888;">{{ post.likes.count }} likes</p>
-    {% endif %}
+        <div style="margin-top:0.5rem;">
+          {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'toggle_post_like' post.id %}" style="display:inline;">
+              {% csrf_token %}
+              {% if post.liked_by_user %}
+                <button type="submit" class="btn btn-gray">❤️ Unlike ({{ post.likes.count }})</button>
+              {% else %}
+                <button type="submit" class="btn btn-red">🤍 Like ({{ post.likes.count }})</button>
+              {% endif %}
+            </form>
+          {% else %}
+            <p class="small" style="color:#888;">{{ post.likes.count }} likes</p>
+          {% endif %}
+        </div>
 
+        <!-- 💬 Comments -->
+        <div style="margin-top:0.75rem; border-top:1px solid #ddd; padding-top:0.5rem;">
+          {% for c in post.comments.all %}
+            <p class="small" style="margin:0.25rem 0;">
+              <strong>{{ c.author.username }}</strong>: {{ c.content }}
+              <span class="small" style="color:#888;">({{ c.created_at|date:"M d, Y H:i" }})</span>
+            </p>
+          {% empty %}
+            <p class="small" style="color:#888;">No comments yet.</p>
+          {% endfor %}
 
-      <!-- 💬 Comments -->
-      <div style="margin-top:0.75rem; border-top:1px solid #ddd; padding-top:0.5rem;">
-        {% for c in post.comments.all %}
-          <p class="small" style="margin:0.25rem 0;">
-            <strong>{{ c.author.username }}</strong>: {{ c.content }}
-            <span class="small" style="color:#888;">({{ c.created_at|date:"M d, Y H:i" }})</span>
-          </p>
-        {% empty %}
-          <p class="small" style="color:#888;">No comments yet.</p>
-        {% endfor %}
+          <!-- ✍️ Add Comment -->
+          {% if request.user.is_authenticated %}
+            <form method="post" action="{% url 'add_post_comment' post.id %}" style="margin-top:0.5rem;">
+              {% csrf_token %}
+              <textarea name="content" rows="1" placeholder="Write a comment..." style="width:100%;"></textarea>
+              <button type="submit" class="btn btn-ghost">Comment</button>
+            </form>
+          {% endif %}
+        </div>
 
-        <!-- ✍️ Add Comment -->
-        {% if user.is_authenticated %}
-          <form method="post" action="{% url 'add_post_comment' post.id %}" style="margin-top:0.5rem;">
-            {% csrf_token %}
-            <textarea name="content" rows="1" placeholder="Write a comment..." style="width:100%;"></textarea>
-            <button type="submit" class="btn btn-ghost">Comment</button>
-          </form>
-        {% endif %}
       </div>
-    </div>
-  {% empty %}
-    <p>No posts yet.</p>
-  {% endfor %}
+    {% empty %}
+      <p style="text-align:center;">No posts yet.</p>
+    {% endfor %}
+  </div>
 </div>
+
 {% endblock %}
