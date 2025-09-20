@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    "db_file_storage",
 
     # third-party
     'allauth',
