@@ -3,7 +3,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-this')
 DEBUG = True
-ALLOWED_HOSTS = [os.environ.get('DJANGO_SECRET_KEY', 'fwendly.onrender.com')]
+ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -65,9 +65,16 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Manila'
 USE_I18N = True
 USE_TZ = True
+# Where collectstatic will put all files
+STATIC_ROOT = BASE_DIR / "static"
+
+# Where Django looks for additional static files (besides app/static)
+STATICFILES_DIRS = [
+    BASE_DIR / "staticfiles",  # optional: where you keep your dev/static files
+]
+
+# URL to access static files
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
