@@ -8,7 +8,6 @@ Django==5.2.6
 django-allauth==65.11.1
 django-cloudinary-storage==0.3.0
 django-cors-headers==4.6.0
-django-db-file-storage @ file:///C:/Users/AD/Downloads/django_db_file_storage-0.5.6.1-py3-none-any.whl#sha256=3feac1e060b550c3c03c35e95d2111d9f100bc247863ace691a78b107f1fc3d5
 django-heroku==0.3.1
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
