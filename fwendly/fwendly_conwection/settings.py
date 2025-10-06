@@ -2,8 +2,8 @@ from pathlib import Path
 import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-this')
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = [os.environ.get('DJANGO_SECRET_KEY', 'fwendly.onrender.com')]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
